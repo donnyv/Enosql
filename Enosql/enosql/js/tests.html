@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script type="text/javascript" src="underscore-min.js"></script>
+    <script type="text/javascript" src="underscore-query.min.js"></script>
+    <script type="text/javascript" src="db.js"></script>
+    <script type="text/javascript" src="util.js"></script>
+    <script type="text/javascript" src="ObjectId.js"></script>
+    <script type="text/javascript">
+
+
+    </script>
+</head>
+<body>
+    <button onclick="CreateCollection('testcollection1')">Create Collection</button>
+    <hr/>
+    <h3>Test ObjectId</h3>
+    <form method="post" action="Objectid.html" onsubmit="return false;">
+        <p><label>Timestamp</label><input type="text" id="timeStamp" size="60" /></p>
+        <p><label>Machine</label><input type="text" id="machine" size="50" /></p>
+        <p><label>Pid</label><input type="text" id="pid" size="50" /></p>
+        <p><label>Increment</label><input type="text" id="increment" size="50" /></p>
+        <p><label>Full String</label><input type="text" id="fullstringversion" size="50" /></p>
+        <p><input type="button" value="Generate new Id" onclick="generateNewId()"/></p>
+    </form>
+    <span id="rawObject"></span>
+    <hr/>
+    <div id="copyrightNotice">Copyright 2011 <a href="mailto:zippy1981@gmail.com">Justin Dearing</a> Licensed under both the <a href="MIT.License.md">MIT License<a> and <a href="GPL-v2.License.md">GPL v2 License<a></div>
+    <script type="text/javascript">
+        function generateNewId() {
+            var objectId = new ObjectId();
+            document.getElementById("timeStamp").value = objectId.getDate();
+            document.getElementById("machine").value = objectId.machine;
+            document.getElementById("pid").value = objectId.pid;
+            document.getElementById("increment").value = objectId.increment;
+            document.getElementById("fullstringversion").value = objectId.toString();
+
+            if (typeof (JSON) == 'object' && typeof (JSON.stringify) == 'function') {
+                var txtNode = document.createTextNode('Raw: ');
+                var element = document.createElement('pre').appendChild(document.createTextNode(JSON.stringify(objectId)));
+                var rawObject = document.getElementById("rawObject");
+                while (rawObject.childNodes.length > 0) {
+                    rawObject.removeChild(rawObject.childNodes[0]);
+                }
+                rawObject.appendChild(txtNode);
+                rawObject.appendChild(element);
+            }
+        }
+    </script>
+    <a href="file://\\ARH-CS11\myiDV\Data\rehab.pdf">test network link</a>
+</body>
+</html>

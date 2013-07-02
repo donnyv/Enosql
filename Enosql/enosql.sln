@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "enosql", "enosql\enosql.csproj", "{728FD091-0961-454A-8235-AD3BF9FF1283}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestForm", "TestForm\TestForm.csproj", "{73A73D58-1DB4-4D9F-A349-52DC4C5C188A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebTest", "WebTest\WebTest.csproj", "{A4EF53E4-0FF8-4436-A8B3-46A4A8748371}"
+EndProject
+Global
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{728FD091-0961-454A-8235-AD3BF9FF1283}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{728FD091-0961-454A-8235-AD3BF9FF1283}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{728FD091-0961-454A-8235-AD3BF9FF1283}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{728FD091-0961-454A-8235-AD3BF9FF1283}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73A73D58-1DB4-4D9F-A349-52DC4C5C188A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73A73D58-1DB4-4D9F-A349-52DC4C5C188A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73A73D58-1DB4-4D9F-A349-52DC4C5C188A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73A73D58-1DB4-4D9F-A349-52DC4C5C188A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4EF53E4-0FF8-4436-A8B3-46A4A8748371}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4EF53E4-0FF8-4436-A8B3-46A4A8748371}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4EF53E4-0FF8-4436-A8B3-46A4A8748371}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4EF53E4-0FF8-4436-A8B3-46A4A8748371}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
