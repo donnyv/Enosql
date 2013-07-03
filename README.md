@@ -7,4 +7,4 @@ This project exists because of the great V8.NET wrapper.
 https://v8dotnet.codeplex.com/
 
 If you don't feel like building from source just use these binaries.  
-**Download:** [Enosql](https://s3.amazonaws.com/cistatic/Enosql.7z)
+**Download:** [Enosql](https://s3.amazonaws.com/dv.github2/Enosql.7z)
