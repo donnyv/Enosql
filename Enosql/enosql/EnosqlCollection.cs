@@ -25,19 +25,20 @@ namespace enosql
 
         public EnosqlResult Insert<T>(T document)
         {
-            EnosqlResult ret = new EnosqlResult();
-            _engineRef.v8Engine.WithContextScope = () =>
-            {
-                string script = @"Insert('" + _collectionName + "'," + JsonConvert.SerializeObject(document) + ");";
-                Handle result = _engineRef.v8Engine.Execute(script, "Enosql Console");
-                ret.IsError = result.IsError;
-                ret.Msg = result.IsError ? result.AsString : string.Empty;
-            };
+            return this.Insert(JsonConvert.SerializeObject(document));
+            //EnosqlResult ret = new EnosqlResult();
+            //_engineRef.v8Engine.WithContextScope = () =>
+            //{
+            //    string script = @"Insert('" + _collectionName + "'," + JsonConvert.SerializeObject(document) + ");";
+            //    Handle result = _engineRef.v8Engine.Execute(script, "Enosql Console");
+            //    ret.IsError = result.IsError;
+            //    ret.Msg = result.IsError ? result.AsString : string.Empty;
+            //};
 
-            if (!ret.IsError)
-                _engineRef.Dirty(_collectionName);
+            //if (!ret.IsError)
+            //    _engineRef.Dirty(_collectionName);
 
-            return ret;
+            //return ret;
         }
 
         public EnosqlResult Insert(string json)

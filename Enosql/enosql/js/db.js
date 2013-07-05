@@ -1,17 +1,12 @@
 ﻿/// <reference path="util.js" />
 
+// Globals
 // e.g. [{ collectionNameUp: "USERS", collectionName: "Users", fileName: "Users.json", _id:<ObjectId> }]
 var _system_namespaces = [];
 
 var _collections = {};
 
-function _GetCollectionIfExists(name) {
-    var col = GetCollection(name);
-    if (!col)
-        throw "Collection doesn't exist!";
-
-    return col;
-}
+var ok = "ok";
 
 function CreateCollection(name) {
     if (CollectionExists(name))
@@ -25,6 +20,8 @@ function CreateCollection(name) {
     };
     _system_namespaces.push(ns);
     _collections[ns._id] = [];
+
+    return ok;
 }
 
 function CollectionExists(name) {
@@ -40,25 +37,18 @@ function GetCollection(name) {
     return null;
 }
 
-function PropertyExist(name, obj) {
-    var _propname = name.toUpperCase();
-    for (var prop in obj) {
-        if (obj.hasOwnProperty(prop)) {
-            if (prop.toUpperCase() == _propname) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
 function Insert(collectionName, item) {
     var col = _GetCollectionIfExists(collectionName);
-
-    if(!PropertyExist("_id", item))
+    
+    if (!_PropertyExist("_id", item))
+        item._id = new ObjectId().toString();
+    
+    if (item._id == null || item._id.trim() == "")
         item._id = new ObjectId().toString();
 
     _collections[col._id].push(item);
+
+    return ok;
 }
 
 function FindById(collectionName, id) {
@@ -79,6 +69,7 @@ function FindAll(collectionName) {
 function RemoveAll(collectionName) {
     var col = _GetCollectionIfExists(collectionName);
     _collections[col._id] = [];
+    return ok;
 }
 
 function Remove(collectionName, id) {
@@ -109,6 +100,7 @@ function Update(collectionName, item) {
 
 function AddNamespaces(ns) {
     _system_namespaces = ns;
+    return ok
 }
 
 function GetNamespaces() {
@@ -119,4 +111,26 @@ function InitialCollectionLoad(cols) {
     for (var i = 0, l = cols.length; i < l; i++) {
         _collections[cols[i].id] = cols[i].data;
     }
+    return ok;
+}
+
+// Internal methods
+function _PropertyExist(name, obj) {
+    var _propname = name.toUpperCase();
+    for (var prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
+            if (prop.toUpperCase() == _propname) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+function _GetCollectionIfExists(name) {
+    var col = GetCollection(name);
+    if (!col)
+        throw "Collection doesn't exist!";
+
+    return col;
 }

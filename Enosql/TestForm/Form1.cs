@@ -11,8 +11,10 @@ using System.Windows.Forms;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-//using V8.Net;
+using V8.Net;
 using Newtonsoft.Json;
+
+using enosql;
 
 namespace TestForm
 {
@@ -34,8 +36,37 @@ namespace TestForm
 
         private void button1_Click(object sender, EventArgs e)
         {
-            dynamic d = JsonConvert.DeserializeObject<dynamic>("{ first: 'donny' ");
-            var check = d;
+            var ret = new EnosqlResult();
+            V8Engine v8Engine = new V8Engine();
+            v8Engine.WithContextScope = () =>
+            {
+
+                string script = @"
+                    function test(first, last){                        
+                        return first + ' ' + last + '!';
+                    }
+                ";
+                Handle result = v8Engine.Execute(script, "Enosql Console");
+                ret.IsError = result.IsError;
+                ret.Msg = result.IsError ? result.AsString : string.Empty;
+                ret.Json = result.IsError ? string.Empty : result.AsString;
+            };
+
+            v8Engine.WithContextScope = () =>
+            {
+                var args = new InternalHandle[2];
+                var args1 = new InternalHandle();
+                args1.Set(v8Engine.CreateString("donny"));
+                var args2 = new InternalHandle();
+                args2.Set(v8Engine.CreateString("v."));
+                args[0] = args1;
+                args[1] = args2;
+
+                Handle result = v8Engine.GlobalObject.Call("test", args);
+                ret.IsError = result.IsError;
+                ret.Msg = result.IsError ? result.AsString : string.Empty;
+                ret.Json = result.IsError ? string.Empty : result.AsString;
+            };
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -140,6 +171,29 @@ namespace TestForm
             var collection1 = db.GetCollection("User1");
             var ret = collection1.Remove("51c9031d5aa01704d8000006");
             
+        }
+
+
+        public class Tasks
+        {
+            public string _id { get; set; }
+            public string task { get; set; }
+            public DateTime duedate { get; set; }
+            public string category { get; set; }
+            public string status { get; set; }
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            var db = new enosql.EnosqlDatabase(@"c:\temp\Todo.jdb");
+            var TaskCollection = db.GetCollection("Tasks");
+            TaskCollection.Insert<Tasks>(new Tasks()
+            {
+                task = "Pick up flowers",
+                duedate = DateTime.Now.AddDays(2),
+                category = "anniversary",
+                status = "unfinished"
+            });
         }
 
        
