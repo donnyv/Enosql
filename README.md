@@ -3,9 +3,43 @@ Enosql - embedded nosql database, based on Chrome V8 engine
 This project will try to mimic the MongoDB C# driver as much as possible.  
 So that its painless to switch to that when your database grows.  
 
+## Usage
+Enosql will take care of creating the database if it doesn't exist
+and creating the collection if it doesn't exist. Just like with MongoDB.
+It will throw an error if the database folder does not have read/write permissions.
+
+        public class Tasks
+        {
+            public string _id { get; set; }
+            public string task { get; set; }
+            public DateTime duedate { get; set; }
+            public string category { get; set; }
+            public string status { get; set; }
+        }
+
+        private void addTask()
+        {
+            var db = new enosql.EnosqlDatabase(@"c:\temp\Todo.jdb");
+            var TaskCollection = db.GetCollection("Tasks");
+            TaskCollection.Insert<Tasks>(new Tasks()
+            {
+                task = "Pick up flowers",
+                duedate = DateTime.Now.AddDays(2),
+                category = "anniversary",
+                status = "unfinished"
+            });
+        }
+
 ## Installation
 If you don't feel like building from source just use these binaries.  
 **Download:** [Enosql](https://s3.amazonaws.com/dv.github2/Enosql.7z)
+
+## Build & Dependency Requirements   
+  Current build solution uses VS2012  
+  Dependencies
+  - V8.NET - https://v8dotnet.codeplex.com/
+  - Json.NET - http://james.newtonking.com/pages/json-net.aspx
+
 
 ## Credits
 This project exists because of the great V8.NET wrapper.  
