@@ -62,7 +62,6 @@
     <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bin\Debug\MongoDB.Bson.dll" />
     <Content Include="bin\Debug\Newtonsoft.Json.dll" />
     <Content Include="bin\Debug\Newtonsoft.Json.pdb" />
     <Content Include="bin\Debug\Newtonsoft.Json.xml" />

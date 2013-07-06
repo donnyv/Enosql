@@ -36,6 +36,7 @@ namespace enosql
             this.Msg = ret.Msg;
             this.Json = ret.Json;
         }
+
         public List<T> Data {
             get
             {

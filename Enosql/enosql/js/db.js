@@ -5,6 +5,7 @@
 var _system_namespaces = [];
 
 var _collections = {};
+var _collectionsSysIds = {};
 
 var ok = "ok";
 
@@ -20,6 +21,7 @@ function CreateCollection(name) {
     };
     _system_namespaces.push(ns);
     _collections[ns._id] = [];
+    _collectionsSysIds[ns._id] = {};
 
     return ok;
 }
@@ -39,14 +41,20 @@ function GetCollection(name) {
 
 function Insert(collectionName, item) {
     var col = _GetCollectionIfExists(collectionName);
-    
-    if (!_PropertyExist("_id", item))
+
+    if (typeof item._id !== "undefined") {
+        if (!IsUnique(col._id, item._id))
+            return "_id already exists";
+    }
+
+    if (typeof item._id === "undefined")
         item._id = new ObjectId().toString();
     
     if (item._id == null || item._id.trim() == "")
         item._id = new ObjectId().toString();
 
     _collections[col._id].push(item);
+    _collectionsSysIds[col._id][item._id] = {};
 
     return ok;
 }
@@ -78,6 +86,7 @@ function Remove(collectionName, id) {
     for (var i = 0, l = col.length; i < l; i++) {
         if (col[i]._id == id) {
             col.splice(i, 1);
+            delete _collectionsSysIds[col._id][id];
             return;
         }
     }
@@ -85,13 +94,21 @@ function Remove(collectionName, id) {
     return -1
 }
 
-function Update(collectionName, item) {
+function Save(collectionName, item) {
     var collInfo = _GetCollectionIfExists(collectionName);
     var col = _collections[collInfo._id]
+
+    // if id doesn't exist then do an insert
+    if (typeof item._id === "undefined" || item._id == null || item._id.trim() == "") {
+        Insert(collectionName, item);
+        return ok;
+    }
+
+    // if id exist and has value then find and update item
     for (var i = 0, l = col.length; i < l; i++) {
         if (col[i]._id == item._id) {
             col[i] = item;
-            return;
+            return ok;
         }
     }
 
@@ -105,6 +122,18 @@ function AddNamespaces(ns) {
 
 function GetNamespaces() {
     return JSON.stringify(_system_namespaces);
+}
+
+function LoadCollectionSysIds(uids) {
+    _collectionsIndex = uids;
+}
+
+function GetCollectionSysIds() {
+    return JSON.stringify(_collectionsIndex);
+}
+
+function IsUnique(colid, id) {
+    return id in _collectionsSysIds[colid] ? false : true;
 }
 
 function InitialCollectionLoad(cols) {

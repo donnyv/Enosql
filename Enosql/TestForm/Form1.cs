@@ -95,7 +95,7 @@ namespace TestForm
 
         public void Insert1(enosql.EnosqlCollection collection, string name, int count)
         {
-            var t = new Person2();
+            var t = new User();
             t.FirstName = name;
             t.LastName = "V.";
             t.id = 0;
@@ -127,10 +127,11 @@ namespace TestForm
         private void button4_Click(object sender, EventArgs e)
         {
             var db = new enosql.EnosqlDatabase(@"c:\temp\test.jdb");
-            var collection1 = db.GetCollection("User1");
-            
-            var ret = collection1.FindAll();
-            MessageBox.Show(ret.Json);
+            var ret = db.GetCollection<User>().Insert(new User(){
+              FirstName = "Luna",
+              LastName = "V"
+            });
+
         }
 
         //public class Persons : V8NativeObject
@@ -142,7 +143,7 @@ namespace TestForm
         //    public string FirstName { get; set; }
         //    public string LastName { get; set; }
         //}
-        public class Person2
+        public class User
         {
             public string FirstName { get; set; }
             public string LastName { get; set; }
@@ -153,16 +154,31 @@ namespace TestForm
         private void button5_Click(object sender, EventArgs e)
         {
             var db = new enosql.EnosqlDatabase(@"c:\temp\test.jdb");
-            var collection1 = db.GetCollection("User1");
+            var collection1 = db.GetCollection<User>();
 
-            var updatePerson = new Person2()
+            var updatePerson = new User()
             {
                 FirstName = "Raven",
 		        LastName = "V.",
 		        id = 1,
 		        _id = "51c9031d5aa01704d8000002"
             };
-            var ret = collection1.Insert<Person2>(updatePerson);
+            var ret = collection1.Insert(updatePerson);
+
+            var ret2 = collection1.Insert<Tasks>(new Tasks()
+            {
+                _id = "51c9031d5aa01704d8000002",
+                task = "get stuff done"
+            });
+
+
+            //var p = collection1.FindById<User>("51c9031d5aa01704d8000002");
+            //var t = collection1.FindById<Tasks>("51c9031d5aa01704d8000003");
+            //var task = t.Data[0];
+
+            //var Pdata = p.Data[0];
+            //Pdata.LastName = "Velazquez";
+            //var ret3 = collection1.Save(Pdata);
         }
 
         private void button6_Click(object sender, EventArgs e)

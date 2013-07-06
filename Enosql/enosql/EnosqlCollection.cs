@@ -26,19 +26,6 @@ namespace enosql
         public EnosqlResult Insert<T>(T document)
         {
             return this.Insert(JsonConvert.SerializeObject(document));
-            //EnosqlResult ret = new EnosqlResult();
-            //_engineRef.v8Engine.WithContextScope = () =>
-            //{
-            //    string script = @"Insert('" + _collectionName + "'," + JsonConvert.SerializeObject(document) + ");";
-            //    Handle result = _engineRef.v8Engine.Execute(script, "Enosql Console");
-            //    ret.IsError = result.IsError;
-            //    ret.Msg = result.IsError ? result.AsString : string.Empty;
-            //};
-
-            //if (!ret.IsError)
-            //    _engineRef.Dirty(_collectionName);
-
-            //return ret;
         }
 
         public EnosqlResult Insert(string json)
@@ -49,7 +36,7 @@ namespace enosql
                 string script = @"Insert('" + _collectionName + "'," + json + ");";
                 Handle result = _engineRef.v8Engine.Execute(script, "Enosql Console");
                 ret.IsError = result.IsError;
-                ret.Msg = result.IsError ? result.AsString : string.Empty;
+                ret.Msg = result.AsString;
             };
 
             if (!ret.IsError)
@@ -73,6 +60,11 @@ namespace enosql
             return ret;
         }
 
+        public EnosqlResult<T> FindById<T>(string _id)
+        {
+            return new EnosqlResult<T>(FindById(_id));
+        }
+
         public EnosqlResult FindAll()
         {
             EnosqlResult ret = new EnosqlResult();
@@ -85,6 +77,11 @@ namespace enosql
                 ret.Json = result.IsError ? string.Empty : result.AsString;
             };
             return ret;
+        }
+
+        public EnosqlResult<T> FindAll<T>()
+        {
+            return new EnosqlResult<T>(FindAll());
         }
 
         public EnosqlResult Remove(string _id)
@@ -123,15 +120,15 @@ namespace enosql
             return ret;
         }
 
-        public EnosqlResult Update<T>(T document)
+        public EnosqlResult Save(string json)
         {
             EnosqlResult ret = new EnosqlResult();
             _engineRef.v8Engine.WithContextScope = () =>
             {
-                string script = @"Update('" + _collectionName + "'," + JsonConvert.SerializeObject(document) + ");";
+                string script = @"Save('" + _collectionName + "'," + json + ");";
                 Handle result = _engineRef.v8Engine.Execute(script, "Enosql Console");
                 ret.IsError = result.IsError;
-                ret.Msg = result.IsError ? result.AsString : string.Empty;
+                ret.Msg = result.AsString;
             };
 
             if (!ret.IsError && ret.DynamicJson != -1)
@@ -140,20 +137,22 @@ namespace enosql
             return ret;
         }
 
+        public EnosqlResult Save<T>(T document)
+        {
+            return Save(JsonConvert.SerializeObject(document));
+        }
+
     }
 
     public class EnosqlCollection<T> : EnosqlCollection
     {
         internal EnosqlCollection(EnosqlEngine engineRef, string name)
-            : base(engineRef, name){}
+            : base(engineRef, name) { }
 
-        public EnosqlResult<T> FindById<T>(string _id)
-        {
-            return new EnosqlResult<T>(base.FindById(_id));
-        }
-        new public EnosqlResult<T> FindAll()
-        {
-            return new EnosqlResult<T>(base.FindAll());
-        }
+
+        //new public EnosqlResult<T> FindAll<T>()
+        //{
+        //    return new EnosqlResult<T>(base.FindAll());
+        //}
     }
 }
