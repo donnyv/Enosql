@@ -32,7 +32,7 @@ It will throw an error if the database folder does not have read/write permissio
 
 ## Installation
 If you don't feel like building from source just use these binaries.  
-**Download:** [Enosql](https://s3.amazonaws.com/dv.github2/Enosql.7z)
+**Download:** [Enosql v 0.6.1](https://s3.amazonaws.com/dv.github2/Enosql-v.0.6.1.7z)
 
 ## Build & Dependency Requirements   
   Current build solution uses VS2012  
