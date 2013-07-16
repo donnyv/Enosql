@@ -41,10 +41,16 @@ namespace enosql
             get
             {
                 if (this.IsError)
-                    return null;
+                    return new List<T>();
 
                 if (string.IsNullOrEmpty(this.Json))
-                    return null;
+                    return new List<T>();
+
+                if (!this.Json.StartsWith("["))
+                    return new List<T>();
+
+                if (!this.Json.EndsWith("]"))
+                    return new List<T>();
 
                 return JsonConvert.DeserializeObject<List<T>>(this.Json);
             }

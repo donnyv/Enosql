@@ -39,11 +39,16 @@ function GetCollection(name) {
     return null;
 }
 
+function DropCollection(name) {
+    var collInfo = _GetCollectionIfExists(name);
+    delete _collections[collInfo._id];
+}
 function Insert(collectionName, item) {
+    item = JSON.parse(item);
     var col = _GetCollectionIfExists(collectionName);
 
     if (typeof item._id !== "undefined") {
-        if (!IsUnique(col._id, item._id))
+        if (!_IsUnique(col._id, item._id))
             return "_id already exists";
     }
 
@@ -67,6 +72,7 @@ function FindById(collectionName, id) {
             return JSON.stringify([col[i]]);
         }
     }
+    return "[]";
 }
 
 function FindAll(collectionName) {
@@ -95,6 +101,7 @@ function Remove(collectionName, id) {
 }
 
 function Save(collectionName, item) {
+    item = JSON.parse(item);
     var collInfo = _GetCollectionIfExists(collectionName);
     var col = _collections[collInfo._id]
 
@@ -116,7 +123,7 @@ function Save(collectionName, item) {
 }
 
 function AddNamespaces(ns) {
-    _system_namespaces = ns;
+    _system_namespaces = JSON.parse(ns);
     return ok
 }
 
@@ -124,19 +131,24 @@ function GetNamespaces() {
     return JSON.stringify(_system_namespaces);
 }
 
-function LoadCollectionSysIds(uids) {
-    _collectionsIndex = uids;
+function BuildCollectionIds() {
+    var colns;
+    for (var i = 0, l = _system_namespaces.length; i < l; i++) {
+        colns = _system_namespaces[i];
+        _collectionsSysIds[colns._id] = {};
+        for (var j = 0, l2 = _collections[colns._id].length; j < l2; j++) {
+            _collectionsSysIds[colns._id][_collections[colns._id][j]._id] = {};
+        }
+    }
+    return ok;
 }
 
 function GetCollectionSysIds() {
     return JSON.stringify(_collectionsIndex);
 }
 
-function IsUnique(colid, id) {
-    return id in _collectionsSysIds[colid] ? false : true;
-}
-
 function InitialCollectionLoad(cols) {
+    cols = JSON.parse(cols);
     for (var i = 0, l = cols.length; i < l; i++) {
         _collections[cols[i].id] = cols[i].data;
     }
@@ -162,4 +174,8 @@ function _GetCollectionIfExists(name) {
         throw "Collection doesn't exist!";
 
     return col;
+}
+
+function _IsUnique(colid, id) {
+    return id in _collectionsSysIds[colid] ? false : true;
 }

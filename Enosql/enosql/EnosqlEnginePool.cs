@@ -43,7 +43,7 @@ namespace enosql
             }
         }
 
-        public static EnosqlEngine GetInstance(string dbasePath)
+        public static EnosqlEngine GetInstance(string dbasePath, double writescheduletime)
         {
             EnosqlEngine engineInstance;
             if (_queue.TryGetValue(dbasePath.ToUpper(), out engineInstance))
@@ -54,6 +54,11 @@ namespace enosql
                 _queue.Add(dbasePath.ToUpper(), engineInstance);
                 return engineInstance;
             }
+        }
+
+        public static void Remove(string dbasePath){
+            _queue[dbasePath].Stop();
+            _queue.Remove(dbasePath);
         }
     }
 }

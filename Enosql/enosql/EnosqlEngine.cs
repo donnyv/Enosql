@@ -23,16 +23,17 @@ namespace enosql
                 return dbPath + @"\system.namespaces.json";
             }
         }
-        
+
         readonly Dictionary<string, string> _jslibs = new Dictionary<string, string>();
         readonly Queue<string> _dirtyQueue = new Queue<string>();
         readonly HashSet<string> _workPool = new HashSet<string>();
-        readonly Timer _writeSchedule = new Timer(500);
+        readonly Timer _writeSchedule = null;
 
-        public EnosqlEngine(string dbasePath)
+        public EnosqlEngine(string dbasePath, double writescheduletime = 600)
         {
             v8Engine = new V8Engine();
             dbPath = dbasePath;
+            _writeSchedule = new Timer(writescheduletime);
             Start();
             _writeSchedule.Elapsed += _writeSchedule_Elapsed;
             _writeSchedule.Start();
@@ -67,11 +68,11 @@ namespace enosql
 
             // Create and start a parallel task
             Task FlushTask;
-            if(dirtyCollection == "system.namespaces")
+            if (dirtyCollection == "system.namespaces")
                 FlushTask = Task.Factory.StartNew(() => FlushSystemNamespaces());
             else
                 FlushTask = Task.Factory.StartNew(() => FlushCollection(dirtyCollection));
-                
+
         }
 
         void FlushSystemNamespaces()
@@ -114,7 +115,9 @@ namespace enosql
                 EnosqlResult ret = new EnosqlResult();
                 v8Engine.WithContextScope = () =>
                 {
-                    Handle result = v8Engine.Execute("FindAll('" + collectionName + "');", "Enosql Console");
+                    var args = new InternalHandle[1];
+                    args[0] = v8Engine.CreateString(collectionName);
+                    Handle result = v8Engine.GlobalObject.Call("FindAll", args);
                     ret.IsError = result.IsError;
                     ret.Msg = result.IsError ? result.AsString : string.Empty;
                     ret.Json = result.IsError ? string.Empty : result.AsString;
@@ -151,14 +154,19 @@ namespace enosql
                 scripts.Append(new StreamReader(dll.GetManifestResourceStream("enosql.js.ObjectId.js")).ReadToEnd());
                 //scripts.Append(new StreamReader(dll.GetManifestResourceStream("enosql.js.util.js")).ReadToEnd());
                 scripts.Append(new StreamReader(dll.GetManifestResourceStream("enosql.js.db.js")).ReadToEnd());
-                //var s = scripts.ToString();
                 Handle result = v8Engine.Execute(scripts.ToString(), "Enosql Console");
                 ret.IsError = result.IsError;
                 ret.Msg = result.IsError ? result.AsString : string.Empty;
             };
 
             LoadNamespaces();
-            LoadCollections();
+            if (!LoadCollections().IsError)
+                BuildCollectionIds();
+        }
+
+        public void Stop()
+        {
+            _writeSchedule.Stop();
         }
 
         public EnosqlResult LoadNamespaces()
@@ -166,16 +174,42 @@ namespace enosql
             if (!File.Exists(NamespacePath))
                 return new EnosqlResult() { IsError = true, Msg = "Does not exist! => " + NamespacePath };
 
+            string ns = File.ReadAllText(NamespacePath);
+            if (string.IsNullOrWhiteSpace(ns))
+                return new EnosqlResult() { IsError = true, Msg = "Empty! => " + NamespacePath };
+
+            // create any missing collections
+            CreateMissingCollectionFiles(ns);
+
             EnosqlResult ret = new EnosqlResult();
             v8Engine.WithContextScope = () =>
             {
-                string ns = File.ReadAllText(NamespacePath);
-                string script = @"AddNamespaces(" + ns + ");";
-                Handle result = v8Engine.Execute(script, "Enosql Console");
+                var args = new InternalHandle[1];
+                args[0] = v8Engine.CreateString(ns);
+                Handle result = v8Engine.GlobalObject.Call("AddNamespaces", args);
                 ret.IsError = result.IsError;
                 ret.Msg = result.IsError ? result.AsString : string.Empty;
             };
             return ret;
+        }
+
+        void CreateMissingCollectionFiles(string NS)
+        {
+            var ns = JsonConvert.DeserializeObject<List<dynamic>>(NS);
+            string filename = string.Empty;
+            string ext = string.Empty;
+            string fullpath = string.Empty;
+            for (int i = 0, l = ns.Count; i < l; i++)
+            {
+                // create empty js file
+                filename = ns[i].fileName;
+                ext = filename.ToLower().EndsWith(".json") ? string.Empty : ".json";
+                fullpath = dbPath + "\\" + filename + ext;
+                if (!File.Exists(fullpath))
+                {
+                    using (File.CreateText(fullpath)) { };
+                }
+            }
         }
 
         class CollectionFile
@@ -199,6 +233,9 @@ namespace enosql
                 if (File.Exists(dbPath + @"\" + namespaces[i].fileName))
                 {
                     var data = File.ReadAllText(dbPath + @"\" + namespaces[i].fileName);
+                    if (string.IsNullOrWhiteSpace(data))
+                        data = "[]";
+
                     cols.Add(new CollectionFile()
                     {
                         id = namespaces[i]._id,
@@ -210,8 +247,21 @@ namespace enosql
             EnosqlResult ret = new EnosqlResult();
             v8Engine.WithContextScope = () =>
             {
-                string script = @"InitialCollectionLoad(" + JsonConvert.SerializeObject(cols) + ");";
-                Handle result = v8Engine.Execute(script, "Enosql Console");
+                var args = new InternalHandle[1];
+                args[0] = v8Engine.CreateString(JsonConvert.SerializeObject(cols));
+                Handle result = v8Engine.GlobalObject.Call("InitialCollectionLoad", args);
+                ret.IsError = result.IsError;
+                ret.Msg = result.IsError ? result.AsString : string.Empty;
+            };
+            return ret;
+        }
+
+        public EnosqlResult BuildCollectionIds()
+        {
+            EnosqlResult ret = new EnosqlResult();
+            v8Engine.WithContextScope = () =>
+            {
+                Handle result = v8Engine.GlobalObject.Call("BuildCollectionIds");
                 ret.IsError = result.IsError;
                 ret.Msg = result.IsError ? result.AsString : string.Empty;
             };

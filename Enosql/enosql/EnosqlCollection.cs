@@ -27,14 +27,15 @@ namespace enosql
         {
             return this.Insert(JsonConvert.SerializeObject(document));
         }
-
         public EnosqlResult Insert(string json)
         {
             EnosqlResult ret = new EnosqlResult();
             _engineRef.v8Engine.WithContextScope = () =>
             {
-                string script = @"Insert('" + _collectionName + "'," + json + ");";
-                Handle result = _engineRef.v8Engine.Execute(script, "Enosql Console");
+                var args = new InternalHandle[2];
+                args[0] = _engineRef.v8Engine.CreateString(_collectionName);
+                args[1] = _engineRef.v8Engine.CreateString(json);
+                Handle result = _engineRef.v8Engine.GlobalObject.Call("Insert", args);
                 ret.IsError = result.IsError;
                 ret.Msg = result.AsString;
             };
@@ -45,15 +46,17 @@ namespace enosql
             return ret;
         }
 
-        public EnosqlResult FindById(string _id)
+        public virtual EnosqlResult FindById(string _id)
         {
             var ret = new EnosqlResult();
             _engineRef.v8Engine.WithContextScope = () =>
             {
-                string script = @"FindById('" + _collectionName + "','" + _id + "');";
-                Handle result = _engineRef.v8Engine.Execute(script, "Enosql Console");
+                var args = new InternalHandle[2];
+                args[0] = _engineRef.v8Engine.CreateString(_collectionName);
+                args[1] = _engineRef.v8Engine.CreateString(_id);
+                Handle result = _engineRef.v8Engine.GlobalObject.Call("FindById", args);
                 ret.IsError = result.IsError;
-                ret.Msg = result.IsError ? result.AsString : string.Empty;
+                ret.Msg =  result.IsError ? result.AsString : string.Empty;
                 ret.Json = result.IsError ? string.Empty : result.AsString;
             };
 
@@ -65,7 +68,7 @@ namespace enosql
             return new EnosqlResult<T>(FindById(_id));
         }
 
-        public EnosqlResult FindAll()
+        public virtual EnosqlResult FindAll()
         {
             EnosqlResult ret = new EnosqlResult();
             _engineRef.v8Engine.WithContextScope = () =>
@@ -149,10 +152,14 @@ namespace enosql
         internal EnosqlCollection(EnosqlEngine engineRef, string name)
             : base(engineRef, name) { }
 
+        public new EnosqlResult<T> FindById(string _id)
+        {
+            return new EnosqlResult<T>(base.FindById(_id));
+        }
 
-        //new public EnosqlResult<T> FindAll<T>()
-        //{
-        //    return new EnosqlResult<T>(base.FindAll());
-        //}
+        public new EnosqlResult<T> FindAll()
+        {
+            return new EnosqlResult<T>(base.FindAll());
+        }
     }
 }

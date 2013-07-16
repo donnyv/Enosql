@@ -13,7 +13,13 @@ namespace enosql
     public class EnosqlDatabase
     {
         EnosqlEngine _engineRef = null;
-        public EnosqlDatabase(string dbasePath)
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dbasePath"></param>
+        /// <param name="writescheduletime">This adjusts the time interval in milliseconds of how often data is written to disk</param>
+        public EnosqlDatabase(string dbasePath, double writescheduletime = 600)
         {
             if (dbasePath == null)
                 throw new ArgumentNullException("dbasePath");
@@ -27,7 +33,7 @@ namespace enosql
             if (!OS.HasWritePermissionOnDir(dbasePath))
                 throw new Exception("Permission denied!\n" + dbasePath);
 
-            _engineRef = EnosqlEnginePool.GetInstance(dbasePath);
+            _engineRef = EnosqlEnginePool.GetInstance(dbasePath, writescheduletime);
         }
 
         public void CreateDatabase(string dbasePath)
@@ -55,6 +61,11 @@ namespace enosql
             }
         }
 
+        public void Drop()
+        {
+            EnosqlEnginePool.Remove(_engineRef.dbPath);
+        }
+
         public EnosqlResult CreateCollection(string name)
         {
             if (name == null)
@@ -74,8 +85,9 @@ namespace enosql
             
             _engineRef.v8Engine.WithContextScope = () =>
             {
-                string script = @"CreateCollection('" + name + "');";
-                Handle result = _engineRef.v8Engine.Execute(script, "Enosql Console");
+                var args = new InternalHandle[1];
+                args[0] = _engineRef.v8Engine.CreateString(name);
+                Handle result = _engineRef.v8Engine.GlobalObject.Call("CreateCollection", args);
                 ret.IsError = result.IsError;
                 ret.Msg = result.IsError ? result.AsString : string.Empty;
             };
@@ -101,7 +113,18 @@ namespace enosql
             }
 
             name = name.Trim();
-            return new EnosqlResult();
+
+            EnosqlResult ret = new EnosqlResult();
+            _engineRef.v8Engine.WithContextScope = () =>
+            {
+                var args = new InternalHandle[1];
+                args[0] = _engineRef.v8Engine.CreateString(name);
+                Handle result = _engineRef.v8Engine.GlobalObject.Call("DropCollection", args);
+                ret.IsError = result.IsError;
+                ret.Msg = result.IsError ? result.AsString : string.Empty;
+            };
+
+            return ret;
         }
 
         public bool IsCollectionNameValid(string name, out string message)
