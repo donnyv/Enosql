@@ -27,25 +27,21 @@ function CreateCollection(name) {
 }
 
 function CollectionExists(name) {
-    var col = GetCollection(name);
+    var col = _GetNamespace(name);
     return col ? true : false;
 }
 
-function GetCollection(name) {
-    for (var i = 0, l = _system_namespaces.length; i < l; i++) {
-        if (_system_namespaces[i].collectionNameUp === name.toUpperCase())
-            return _system_namespaces[i];
-    }
-    return null;
+function DropCollection(name) {
+    var nsInfo = _GetNamespaceIfExists(name);
+    delete _collections[nsInfo._id];
+    delete _collectionsSysIds[nsInfo._id];
+    _RemoveNamespace(nsInfo._id);
+    return ok;
 }
 
-function DropCollection(name) {
-    var collInfo = _GetCollectionIfExists(name);
-    delete _collections[collInfo._id];
-}
 function Insert(collectionName, item) {
     item = JSON.parse(item);
-    var col = _GetCollectionIfExists(collectionName);
+    var col = _GetNamespaceIfExists(collectionName);
 
     if (typeof item._id !== "undefined") {
         if (!_IsUnique(col._id, item._id))
@@ -65,8 +61,8 @@ function Insert(collectionName, item) {
 }
 
 function FindById(collectionName, id) {
-    var collInfo = _GetCollectionIfExists(collectionName);
-    var col = _collections[collInfo._id]
+    var nsInfo = _GetNamespaceIfExists(collectionName);
+    var col = _collections[nsInfo._id]
     for (var i = 0, l = col.length; i < l; i++) {
         if (col[i]._id == id) {
             return JSON.stringify([col[i]]);
@@ -76,19 +72,19 @@ function FindById(collectionName, id) {
 }
 
 function FindAll(collectionName) {
-    var col = _GetCollectionIfExists(collectionName);
+    var col = _GetNamespaceIfExists(collectionName);
     return JSON.stringify(_collections[col._id]);
 }
 
 function RemoveAll(collectionName) {
-    var col = _GetCollectionIfExists(collectionName);
+    var col = _GetNamespaceIfExists(collectionName);
     _collections[col._id] = [];
     return ok;
 }
 
 function Remove(collectionName, id) {
-    var collInfo = _GetCollectionIfExists(collectionName);
-    var col = _collections[collInfo._id]
+    var nsInfo = _GetNamespaceIfExists(collectionName);
+    var col = _collections[nsInfo._id]
     for (var i = 0, l = col.length; i < l; i++) {
         if (col[i]._id == id) {
             col.splice(i, 1);
@@ -102,8 +98,8 @@ function Remove(collectionName, id) {
 
 function Save(collectionName, item) {
     item = JSON.parse(item);
-    var collInfo = _GetCollectionIfExists(collectionName);
-    var col = _collections[collInfo._id]
+    var nsInfo = _GetNamespaceIfExists(collectionName);
+    var col = _collections[nsInfo._id]
 
     // if id doesn't exist then do an insert
     if (typeof item._id === "undefined" || item._id == null || item._id.trim() == "") {
@@ -129,6 +125,10 @@ function AddNamespaces(ns) {
 
 function GetNamespaces() {
     return JSON.stringify(_system_namespaces);
+}
+
+function GetNamespace(name) {
+    return JSON.stringify(_GetNamespace(name));
 }
 
 function BuildCollectionIds() {
@@ -168,8 +168,26 @@ function _PropertyExist(name, obj) {
     return false;
 }
 
-function _GetCollectionIfExists(name) {
-    var col = GetCollection(name);
+function _GetNamespace(name) {
+    for (var i = 0, l = _system_namespaces.length; i < l; i++) {
+        if (_system_namespaces[i].collectionNameUp === name.toUpperCase())
+            return _system_namespaces[i];
+    }
+    return null;
+}
+
+function _RemoveNamespace(id) {
+    for (var i = 0, l = _system_namespaces.length; i < l; i++) {
+        if (_system_namespaces[i]._id === id) {
+            _system_namespaces.splice(i, 1);
+            return ok;
+        }
+    }
+    return -1;
+}
+
+function _GetNamespaceIfExists(name) {
+    var col = _GetNamespace(name);
     if (!col)
         throw "Collection doesn't exist!";
 
