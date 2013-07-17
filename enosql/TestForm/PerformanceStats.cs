@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 using V8.Net;
 
@@ -28,13 +29,57 @@ namespace TestForm
             public string _id { get; set; }
         }
 
-        public static string InsertPerfStat(StatSettings settings)
+        public static string InsertJSONPerfStat(StatSettings settings)
         {
+
             var db = new enosql.EnosqlDatabase(settings.dbpath, settings.writescheduleTime);
             if (!settings.withWarmUp)
             {
                 db.Drop();
                 db = new enosql.EnosqlDatabase(settings.dbpath, settings.writescheduleTime);
+            }
+            else
+            {
+                db.DropCollection("UsersJson");
+            }
+
+            var Users = db.GetCollection("UsersJson");
+
+
+            EnosqlResult ret = null;
+
+            string json = string.Empty;
+            var StartTime = DateTime.Now;
+            for (int i = 0, l = settings.count; i < l; i++)
+            {
+                json = @"{
+		                    'FirstName' : 'Donny',
+		                    'LastName' : 'V.',
+		                    'id' : " + i +
+	                    "}";
+                ret = Users.Insert(json);
+            }
+            var EndTime = DateTime.Now;
+
+            if (ret.IsError)
+                throw new Exception(ret.Msg);
+
+            var TimeToComplete = EndTime.Subtract(StartTime);
+            return TimeToComplete.ToString() + " sec";
+        }
+
+        public static string InsertObjectPerfStat(StatSettings settings)
+        {
+            
+            var db = new enosql.EnosqlDatabase(settings.dbpath, settings.writescheduleTime);
+            if (!settings.withWarmUp)
+            {
+                db.Drop();
+                db = new enosql.EnosqlDatabase(settings.dbpath, settings.writescheduleTime);
+            }
+            else
+            {
+                db.DropCollection<Users>();
             }
 
             var Users = db.GetCollection<Users>();

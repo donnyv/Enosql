@@ -34,6 +34,9 @@
             this.txtResult = new System.Windows.Forms.TextBox();
             this.txtRunTimes = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.button3 = new System.Windows.Forms.Button();
+            this.txtWriteTime = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnInsertPerf
@@ -73,6 +76,7 @@
             this.txtResult.Location = new System.Drawing.Point(12, 79);
             this.txtResult.Multiline = true;
             this.txtResult.Name = "txtResult";
+            this.txtResult.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtResult.Size = new System.Drawing.Size(646, 346);
             this.txtResult.TabIndex = 3;
             // 
@@ -94,9 +98,40 @@
             this.label2.TabIndex = 4;
             this.label2.Text = "run times:";
             // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(256, 38);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(101, 36);
+            this.button3.TabIndex = 6;
+            this.button3.Text = "Insert Perf";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // txtWriteTime
+            // 
+            this.txtWriteTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtWriteTime.Location = new System.Drawing.Point(556, 6);
+            this.txtWriteTime.Name = "txtWriteTime";
+            this.txtWriteTime.Size = new System.Drawing.Size(58, 26);
+            this.txtWriteTime.TabIndex = 8;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(477, 9);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(80, 20);
+            this.label3.TabIndex = 7;
+            this.label3.Text = "write time:";
+            // 
             // Form1
             // 
             this.ClientSize = new System.Drawing.Size(670, 437);
+            this.Controls.Add(this.txtWriteTime);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.button3);
             this.Controls.Add(this.txtRunTimes);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtResult);
@@ -123,6 +158,9 @@
         private System.Windows.Forms.Button WarmUp;
         private System.Windows.Forms.Button button8;
         private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.TextBox txtWriteTime;
+        private System.Windows.Forms.Label label3;
     }
 }
 
