@@ -15,11 +15,13 @@ namespace enosql
     public class EnosqlCollection
     {
         EnosqlEngine _engineRef = null;
+        EnosqlDatabase _db = null;
         string _collectionName = string.Empty;
 
-        internal EnosqlCollection(EnosqlEngine engineRef, string name)
+        internal EnosqlCollection(EnosqlEngine engineRef, EnosqlDatabase db, string name)
         {
             _engineRef = engineRef;
+            _db = db;
             _collectionName = name;
         }
 
@@ -145,12 +147,16 @@ namespace enosql
             return Save(JsonConvert.SerializeObject(document));
         }
 
+        public EnosqlResult Drop()
+        {
+            return _db.DropCollection(_collectionName);
+        }
     }
 
     public class EnosqlCollection<T> : EnosqlCollection
     {
-        internal EnosqlCollection(EnosqlEngine engineRef, string name)
-            : base(engineRef, name) { }
+        internal EnosqlCollection(EnosqlEngine engineRef, EnosqlDatabase db, string name)
+            : base(engineRef, db, name) { }
 
         public new EnosqlResult<T> FindById(string _id)
         {

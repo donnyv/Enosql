@@ -126,13 +126,18 @@ namespace enosql
                 if (ret.IsError)
                     throw new Exception(ret.Msg);
 
-                // write to disk
-                using (var file = new System.IO.FileStream(this.dbPath + "\\" + collectionName + ".json", FileMode.Truncate))
+                // cheaper to catch exception file not found, since it shouldn't happen often then using file.exists()
+                try
                 {
-                    byte[] info = new UTF8Encoding(true).GetBytes(ret.Json);
-                    file.Write(info, 0, info.Length);
+                    // write to disk
+                    using (var file = new System.IO.FileStream(this.dbPath + "\\" + collectionName + ".json", FileMode.Truncate))
+                    {
+                        byte[] info = new UTF8Encoding(true).GetBytes(ret.Json);
+                        file.Write(info, 0, info.Length);
+                    }
                 }
-
+                catch { }
+                
                 _workPool.Remove(collectionName);
             }
             catch (Exception ex)

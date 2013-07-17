@@ -64,6 +64,7 @@ namespace enosql
         public void Drop()
         {
             EnosqlEnginePool.Remove(_engineRef.dbPath);
+            Directory.Delete(_engineRef.dbPath, true);
         }
 
         public EnosqlResult CreateCollection(string name)
@@ -114,17 +115,45 @@ namespace enosql
 
             name = name.Trim();
 
-            EnosqlResult ret = new EnosqlResult();
+            // get namespace info
+            EnosqlResult retNameSpaceInfo = new EnosqlResult();
+            _engineRef.v8Engine.WithContextScope = () =>
+            {
+                var args = new InternalHandle[1];
+                args[0] = _engineRef.v8Engine.CreateString(name);
+                Handle result = _engineRef.v8Engine.GlobalObject.Call("GetNamespace", args);
+                retNameSpaceInfo.IsError = result.IsError;
+                retNameSpaceInfo.Msg = result.IsError ? result.AsString : string.Empty;
+                retNameSpaceInfo.Json = result.IsError ? string.Empty : result.AsString;
+            };
+
+            if (retNameSpaceInfo.IsError)
+                return retNameSpaceInfo;
+
+            // drop collection
+            EnosqlResult retDropColl = new EnosqlResult();
             _engineRef.v8Engine.WithContextScope = () =>
             {
                 var args = new InternalHandle[1];
                 args[0] = _engineRef.v8Engine.CreateString(name);
                 Handle result = _engineRef.v8Engine.GlobalObject.Call("DropCollection", args);
-                ret.IsError = result.IsError;
-                ret.Msg = result.IsError ? result.AsString : string.Empty;
+                retDropColl.IsError = result.IsError;
+                retDropColl.Msg = result.IsError ? result.AsString : string.Empty;
             };
 
-            return ret;
+            // flush namespace
+            _engineRef.Dirty("system.namespaces");
+
+            //delete collection file
+            var collFilePath = _engineRef.dbPath + "\\" + retNameSpaceInfo.DynamicJson.fileName;
+            if(File.Exists(collFilePath))
+                File.Delete(collFilePath);
+
+            return retDropColl;
+        }
+        public EnosqlResult DropCollection<T>() where T : class
+        {
+            return DropCollection(typeof(T).Name);
         }
 
         public bool IsCollectionNameValid(string name, out string message)
@@ -213,9 +242,8 @@ namespace enosql
                 }
             }
 
-            return new EnosqlCollection(_engineRef, name);
+            return new EnosqlCollection(_engineRef, this, name);
         }
-
         public EnosqlCollection<T> GetCollection<T>() where T : class
         {
             var name = typeof(T).Name;
@@ -228,7 +256,7 @@ namespace enosql
                 }
             }
 
-            return new EnosqlCollection<T>(_engineRef, name);
+            return new EnosqlCollection<T>(_engineRef, this, name);
         }
     }
 }
