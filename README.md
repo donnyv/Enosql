@@ -32,7 +32,21 @@ It will throw an error if the database folder does not have read/write permissio
 
 ## Installation
 If you don't feel like building from source just use these binaries.  
-**Download:** [Enosql v 0.6.1](https://s3.amazonaws.com/dv.github2/Enosql-v.0.6.1.7z)
+**Download:** [Enosql v 0.7.1](https://s3.amazonaws.com/dv.github2/enosql-v0.7.1.7z)
+
+## Performance
+        insert 5000 records, 100k each - Serialize Object - write scheduled every 100 msec
+        no warm up
+        ---------------------------------------------
+        00:00:01.3900000 sec
+        00:00:01.3600000 sec
+        00:00:01.3670000 sec
+        
+        with warm up
+        ---------------------------------------------
+        00:00:01.5670000 sec
+        00:00:01.2840000 sec
+        00:00:01.6270000 sec
 
 ## Build & Dependency Requirements   
   Current build solution uses VS2012  
