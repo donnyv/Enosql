@@ -20,8 +20,8 @@ It will throw an error if the database folder does not have read/write permissio
         private void addTask()
         {
             var db = new enosql.EnosqlDatabase(@"c:\temp\Todo.jdb");
-            var TaskCollection = db.GetCollection("Tasks");
-            TaskCollection.Insert<Tasks>(new Tasks()
+            var TaskCollection = db.GetCollection<Tasks>();
+            TaskCollection.Insert(new Tasks()
             {
                 task = "Pick up flowers",
                 duedate = DateTime.Now.AddDays(2),
