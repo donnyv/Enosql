@@ -8,6 +8,7 @@ using System.IO;
 using V8.Net;
 
 using enosql;
+using enosql.Builders;
 
 namespace TestForm
 {
@@ -25,7 +26,7 @@ namespace TestForm
         {
             public string FirstName { get; set; }
             public string LastName { get; set; }
-            public int id { get; set; }
+            public int index { get; set; }
             public string _id { get; set; }
         }
 
@@ -55,7 +56,7 @@ namespace TestForm
                 json = @"{
 		                    'FirstName' : 'Donny',
 		                    'LastName' : 'V.',
-		                    'id' : " + i +
+		                    'index' : " + i +
 	                    "}";
                 ret = Users.Insert(json);
             }
@@ -87,15 +88,37 @@ namespace TestForm
             var t = new Users();
             t.FirstName = "Donny";
             t.LastName = "V.";
-            t.id = 0;
+            t.index = 0;
 
             EnosqlResult ret = null;
 
             var StartTime = DateTime.Now;
             for (int i = 0, l = settings.count; i < l; i++)
             {
-                t.id = (t.id + 1);
+                t.index = (t.index + 1);
                 ret = Users.Insert(t);
+            }
+            var EndTime = DateTime.Now;
+
+            if (ret.IsError)
+                throw new Exception(ret.Msg);
+
+            var TimeToComplete = EndTime.Subtract(StartTime);
+            return TimeToComplete.ToString() + " sec";
+        }
+
+        public static string QueryPerStat1(StatSettings settings)
+        {
+            var db = new enosql.EnosqlDatabase(settings.dbpath, settings.writescheduleTime);
+            var Users = db.GetCollection<Users>();
+
+            EnosqlResult ret = null;
+
+            var StartTime = DateTime.Now;
+            var query = EnosqlQuery.EQ("FirstName", "Donny3");
+            for (int i = 0, l = settings.count; i < l; i++)
+            {
+                ret = Users.Find(query);
             }
             var EndTime = DateTime.Now;
 

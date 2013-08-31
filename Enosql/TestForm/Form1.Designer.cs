@@ -28,26 +28,28 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnInsertPerf = new System.Windows.Forms.Button();
+            this.btnInsertJSONPerf = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.txtCount = new System.Windows.Forms.TextBox();
             this.txtResult = new System.Windows.Forms.TextBox();
             this.txtRunTimes = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.button3 = new System.Windows.Forms.Button();
+            this.btnInsertObjectPerf = new System.Windows.Forms.Button();
             this.txtWriteTime = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.button4 = new System.Windows.Forms.Button();
+            this.btnQueryPerfTest = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // btnInsertPerf
+            // btnInsertJSONPerf
             // 
-            this.btnInsertPerf.Location = new System.Drawing.Point(12, 38);
-            this.btnInsertPerf.Name = "btnInsertPerf";
-            this.btnInsertPerf.Size = new System.Drawing.Size(101, 36);
-            this.btnInsertPerf.TabIndex = 0;
-            this.btnInsertPerf.Text = "Insert Perf";
-            this.btnInsertPerf.UseVisualStyleBackColor = true;
-            this.btnInsertPerf.Click += new System.EventHandler(this.btnInsertPerf_Click);
+            this.btnInsertJSONPerf.Location = new System.Drawing.Point(12, 38);
+            this.btnInsertJSONPerf.Name = "btnInsertJSONPerf";
+            this.btnInsertJSONPerf.Size = new System.Drawing.Size(101, 36);
+            this.btnInsertJSONPerf.TabIndex = 0;
+            this.btnInsertJSONPerf.Text = "Insert JSON Perf Test";
+            this.btnInsertJSONPerf.UseVisualStyleBackColor = true;
+            this.btnInsertJSONPerf.Click += new System.EventHandler(this.btnInsertJSONPerf_Click);
             // 
             // label1
             // 
@@ -66,6 +68,7 @@
             this.txtCount.Name = "txtCount";
             this.txtCount.Size = new System.Drawing.Size(254, 26);
             this.txtCount.TabIndex = 2;
+            this.txtCount.Text = "1000";
             // 
             // txtResult
             // 
@@ -87,6 +90,7 @@
             this.txtRunTimes.Name = "txtRunTimes";
             this.txtRunTimes.Size = new System.Drawing.Size(58, 26);
             this.txtRunTimes.TabIndex = 5;
+            this.txtRunTimes.Text = "3";
             // 
             // label2
             // 
@@ -98,15 +102,15 @@
             this.label2.TabIndex = 4;
             this.label2.Text = "run times:";
             // 
-            // button3
+            // btnInsertObjectPerf
             // 
-            this.button3.Location = new System.Drawing.Point(256, 38);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(101, 36);
-            this.button3.TabIndex = 6;
-            this.button3.Text = "Insert Perf";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.btnInsertObjectPerf.Location = new System.Drawing.Point(119, 38);
+            this.btnInsertObjectPerf.Name = "btnInsertObjectPerf";
+            this.btnInsertObjectPerf.Size = new System.Drawing.Size(101, 36);
+            this.btnInsertObjectPerf.TabIndex = 6;
+            this.btnInsertObjectPerf.Text = "Insert Obj Perf Test";
+            this.btnInsertObjectPerf.UseVisualStyleBackColor = true;
+            this.btnInsertObjectPerf.Click += new System.EventHandler(this.btnInsertObjectPerf_Click);
             // 
             // txtWriteTime
             // 
@@ -115,6 +119,7 @@
             this.txtWriteTime.Name = "txtWriteTime";
             this.txtWriteTime.Size = new System.Drawing.Size(58, 26);
             this.txtWriteTime.TabIndex = 8;
+            this.txtWriteTime.Text = "100";
             // 
             // label3
             // 
@@ -126,18 +131,40 @@
             this.label3.TabIndex = 7;
             this.label3.Text = "write time:";
             // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(556, 38);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(101, 36);
+            this.button4.TabIndex = 9;
+            this.button4.Text = "Insert Obj Perf Test";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // btnQueryPerfTest
+            // 
+            this.btnQueryPerfTest.Location = new System.Drawing.Point(226, 38);
+            this.btnQueryPerfTest.Name = "btnQueryPerfTest";
+            this.btnQueryPerfTest.Size = new System.Drawing.Size(101, 36);
+            this.btnQueryPerfTest.TabIndex = 10;
+            this.btnQueryPerfTest.Text = "Query Perf Test";
+            this.btnQueryPerfTest.UseVisualStyleBackColor = true;
+            this.btnQueryPerfTest.Click += new System.EventHandler(this.btnQueryPerfTest_Click);
+            // 
             // Form1
             // 
             this.ClientSize = new System.Drawing.Size(670, 437);
+            this.Controls.Add(this.btnQueryPerfTest);
+            this.Controls.Add(this.button4);
             this.Controls.Add(this.txtWriteTime);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.button3);
+            this.Controls.Add(this.btnInsertObjectPerf);
             this.Controls.Add(this.txtRunTimes);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtResult);
             this.Controls.Add(this.txtCount);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.btnInsertPerf);
+            this.Controls.Add(this.btnInsertJSONPerf);
             this.Name = "Form1";
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -146,21 +173,18 @@
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        
         private System.Windows.Forms.TextBox txtRunTimes;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox txtResult;
-        private System.Windows.Forms.Button btnInsertPerf;
+        private System.Windows.Forms.Button btnInsertJSONPerf;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtCount;
-        private System.Windows.Forms.Button button5;
-        private System.Windows.Forms.Button WarmUp;
-        private System.Windows.Forms.Button button8;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button btnInsertObjectPerf;
         private System.Windows.Forms.TextBox txtWriteTime;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button btnQueryPerfTest;
     }
 }
 

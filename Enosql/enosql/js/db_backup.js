@@ -65,10 +65,8 @@ function Insert(collectionName, item) {
 function Find(collectionName, query) {
     var nsInfo = _GetNamespaceIfExists(collectionName);
     var col = _collections[nsInfo._id];
-    var q = JSON.parse(query);
-    _ProcessRegexProps(q, "$regex");
-
-    var results = _.query(col, q);
+    var query = JSON.parse(query);
+    var results = _.query(col, query);
     return results == null ? "[]" : JSON.stringify(results);
 }
 
@@ -208,25 +206,4 @@ function _GetNamespaceIfExists(name) {
 
 function _IsUnique(colid, id) {
     return id in _collectionsSysIds[colid] ? false : true;
-}
-
-function _ProcessRegexProps(obj, name) {
-    var _propname = name.toUpperCase();
-
-    for (var prop in obj) {
-        if (obj.hasOwnProperty(prop)) {
-            if (typeof obj[prop] === "object" && obj[prop] != null) {
-                _ProcessRegexProps(obj[prop], name);
-            }
-            if (prop.toUpperCase() == _propname) {
-                var RegexValue = obj[prop];
-                var regex = RegexValue.substring(1, RegexValue.lastIndexOf("/"));
-                var end = null;
-                if (RegexValue[RegexValue.length - 1] != "/") {
-                    end = RegexValue.substring(RegexValue.lastIndexOf("/") + 1);
-                }
-                obj[prop] = (end == null ? new RegExp(regex) : new RegExp(regex, end));
-            }
-        }
-    }
 }

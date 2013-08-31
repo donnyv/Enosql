@@ -19,7 +19,7 @@ namespace enosql
         /// </summary>
         /// <param name="dbasePath"></param>
         /// <param name="writescheduletime">This adjusts the time interval in milliseconds of how often data is written to disk</param>
-        public EnosqlDatabase(string dbasePath, double writescheduletime = 600)
+        public EnosqlDatabase(string dbasePath, double writescheduletime = 100)
         {
             if (dbasePath == null)
                 throw new ArgumentNullException("dbasePath");
@@ -74,7 +74,7 @@ namespace enosql
                 throw new ArgumentNullException("name");
             }
 
-            name = name.Trim();
+            name = name.Trim().ToLower();
             EnosqlResult ret = new EnosqlResult();
             string errorMsg = string.Empty;
             if (!IsCollectionNameValid(name, out errorMsg))

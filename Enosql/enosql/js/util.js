@@ -23,5 +23,7 @@
         }
     }
 
-    if (!dbe.util) { dbe.util = util; }
+    if (typeof dbe.util === "undefinded") {
+        dbe.util = util;
+    }
 })();

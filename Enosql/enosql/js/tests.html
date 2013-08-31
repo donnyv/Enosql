@@ -4,14 +4,78 @@
 <head>
     <meta charset="utf-8" />
     <title></title>
-    <script type="text/javascript" src="underscore-min.js"></script>
+    <script type="text/javascript">
+        var dbe = {};
+    </script>
+    <script type="text/javascript" src="lodash.min.js"></script>
     <script type="text/javascript" src="underscore-query.min.js"></script>
     <script type="text/javascript" src="db.js"></script>
     <script type="text/javascript" src="util.js"></script>
     <script type="text/javascript" src="ObjectId.js"></script>
     <script type="text/javascript">
+        var data = [
+            { "FirstName": "DonnyV1", "index": 520, "LastName": "Velaz" },
+            { "FirstName": "DonnyV2", "index": 519 },
+            { "FirstName": "DoNNyV1", "index": 600 },
+            { "FirstName": "donnyv1", "index": 519 }
+        ];
+        
+        var q1 = {
+            $and: {
+                index: 519,
+                FirstName: {
+                    $regex: "/^donnyv1$/i"
+                }
+            }
+        };
+
+        var q2 = {
+            $or: {
+                index: 530,
+                LastName: "Velaz",
+                FirstName: {
+                    $equal: "donnyv1"
+                },
+                FirstName: {
+                    $equal: "DoNNyV1"
+                }
+            }
+        };
+
+        var q3 = {
+            "$or": [{
+                FirstName: "DonnyV1"
+            }, {
+                FirstName: "DonnyV2"
+            }
+            ]
+        };
 
 
+        ProcessRegexProps(q3, "$regex");
+
+        var res = _.query(data, q3);
+
+        function ProcessRegexProps (obj, name) {
+            var _propname = name.toUpperCase();
+
+            for (var prop in obj) {
+                if (obj.hasOwnProperty(prop)) {
+                    if (typeof obj[prop] === "object" && obj[prop] != null) {
+                        ProcessRegexProps(obj[prop], name);
+                    }
+                    if (prop.toUpperCase() == _propname) {
+                        var RegexValue = obj[prop];
+                        var regex = RegexValue.substring(1, RegexValue.lastIndexOf("/"));
+                        var end = null;
+                        if (RegexValue[RegexValue.length - 1] != "/") {
+                            end = RegexValue.substring(RegexValue.lastIndexOf("/") + 1);
+                        }
+                        obj[prop] = (end == null ? new RegExp(regex) : new RegExp(regex, end));
+                    }
+                }
+            } 
+        }
     </script>
 </head>
 <body>
@@ -25,11 +89,15 @@
         <p><label>Increment</label><input type="text" id="increment" size="50" /></p>
         <p><label>Full String</label><input type="text" id="fullstringversion" size="50" /></p>
         <p><input type="button" value="Generate new Id" onclick="generateNewId()"/></p>
+        <input type="button" value="Test JSON parse" onclick="test()"/>
     </form>
     <span id="rawObject"></span>
     <hr/>
     <div id="copyrightNotice">Copyright 2011 <a href="mailto:zippy1981@gmail.com">Justin Dearing</a> Licensed under both the <a href="MIT.License.md">MIT License<a> and <a href="GPL-v2.License.md">GPL v2 License<a></div>
     <script type="text/javascript">
+        function test() {
+            var obj = JSON.parse('{ "FirstName": { "$equal": "Jane" } }');
+        }
         function generateNewId() {
             var objectId = new ObjectId();
             document.getElementById("timeStamp").value = objectId.getDate();

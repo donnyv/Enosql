@@ -155,7 +155,9 @@ namespace enosql
                 Assembly dll = Assembly.GetExecutingAssembly();
                 var scripts = new StringBuilder();
                 scripts.Append("var dbe = {};");
-                scripts.Append(new StreamReader(dll.GetManifestResourceStream("enosql.js.underscore-min.js")).ReadToEnd());
+                //scripts.Append(new StreamReader(dll.GetManifestResourceStream("enosql.js.underscore-min.js")).ReadToEnd());
+                scripts.Append(new StreamReader(dll.GetManifestResourceStream("enosql.js.lodash.min.js")).ReadToEnd());
+                scripts.Append(new StreamReader(dll.GetManifestResourceStream("enosql.js.underscore-query.min.js")).ReadToEnd());
                 scripts.Append(new StreamReader(dll.GetManifestResourceStream("enosql.js.ObjectId.js")).ReadToEnd());
                 //scripts.Append(new StreamReader(dll.GetManifestResourceStream("enosql.js.util.js")).ReadToEnd());
                 scripts.Append(new StreamReader(dll.GetManifestResourceStream("enosql.js.db.js")).ReadToEnd());

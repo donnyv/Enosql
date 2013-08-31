@@ -22,13 +22,9 @@ namespace enosql
         {
             _engineRef = engineRef;
             _db = db;
-            _collectionName = name;
+            _collectionName = name.ToLower();
         }
 
-        public EnosqlResult Insert<T>(T document)
-        {
-            return this.Insert(JsonConvert.SerializeObject(document));
-        }
         public EnosqlResult Insert(string json)
         {
             EnosqlResult ret = new EnosqlResult();
@@ -47,6 +43,31 @@ namespace enosql
 
             return ret;
         }
+        public EnosqlResult Insert<T>(T document)
+        {
+            return this.Insert(JsonConvert.SerializeObject(document));
+        }
+        
+        public virtual EnosqlResult Find(string query)
+        {
+            var ret = new EnosqlResult();
+            _engineRef.v8Engine.WithContextScope = () =>
+            {
+                var args = new InternalHandle[2];
+                args[0] = _engineRef.v8Engine.CreateString(_collectionName);
+                args[1] = _engineRef.v8Engine.CreateString(query);
+                Handle result = _engineRef.v8Engine.GlobalObject.Call("Find", args);
+                ret.IsError = result.IsError;
+                ret.Msg = result.IsError ? result.AsString : string.Empty;
+                ret.Json = result.IsError ? string.Empty : result.AsString;
+            };
+
+            return ret;
+        }
+        public EnosqlResult<T> Find<T>(string query)
+        {
+            return new EnosqlResult<T>(Find(query));
+        }
 
         public virtual EnosqlResult FindById(string _id)
         {
@@ -64,7 +85,6 @@ namespace enosql
 
             return ret;
         }
-
         public EnosqlResult<T> FindById<T>(string _id)
         {
             return new EnosqlResult<T>(FindById(_id));
@@ -83,7 +103,6 @@ namespace enosql
             };
             return ret;
         }
-
         public EnosqlResult<T> FindAll<T>()
         {
             return new EnosqlResult<T>(FindAll());
@@ -141,7 +160,6 @@ namespace enosql
 
             return ret;
         }
-
         public EnosqlResult Save<T>(T document)
         {
             return Save(JsonConvert.SerializeObject(document));
@@ -157,6 +175,11 @@ namespace enosql
     {
         internal EnosqlCollection(EnosqlEngine engineRef, EnosqlDatabase db, string name)
             : base(engineRef, db, name) { }
+
+        public new EnosqlResult<T> Find(string query)
+        {
+            return new EnosqlResult<T>(base.Find(query));
+        }
 
         public new EnosqlResult<T> FindById(string _id)
         {
