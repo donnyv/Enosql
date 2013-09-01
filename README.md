@@ -56,7 +56,7 @@ If you don't feel like building from source just use these binaries.
 
 
 ## Credits
-This project exists because of the great V8.NET wrapper.  
+This project would not exist without the great V8.NET wrapper.  
 https://v8dotnet.codeplex.com/
 
 ## License
